@@ -1,0 +1,1 @@
+Meeting notes: Implement proecural generation to add soul to the game and demonstrate intellectual thinking, don't worry so much about the animations and design of the game because it is the functionality of the game and the ability to demonstrate creative thinking that gets marks, COMMIT MORE.
