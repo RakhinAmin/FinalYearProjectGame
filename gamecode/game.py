@@ -23,7 +23,6 @@ class Soldier(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.speed = speed
         self.direction_x = 0
-        self.direction_y = 0
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
 
@@ -32,9 +31,21 @@ class Soldier(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.direction_x
+        self.check_boundary_collision()
+        self.check_enemy_collision()
 
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
+
+    def check_boundary_collision(self):
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > SCREEN_WIDTH:
+            self.rect.right = SCREEN_WIDTH
+
+    def check_enemy_collision(self):
+        if self.rect.colliderect(enemy.rect):
+            print("Player collision with enemy detected!")
 
 
 player = Soldier(200, 200, 30, 30, 5, (255, 0, 0))
