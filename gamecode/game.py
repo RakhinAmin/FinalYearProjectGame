@@ -85,6 +85,10 @@ while run:
             if event.key == pygame.K_UP:
                 player.jump_start()
 
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                player.move(0)
+
     player.update()
     player.draw()
     enemy.draw()
