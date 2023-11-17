@@ -1,97 +1,94 @@
 import pygame
 
-pygame.init()
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Scrolling Shooter Game')
-
-clock = pygame.time.Clock()
-FPS = 60
-
-BG = (144, 201, 120)
-
-
-def draw_bg():
-    screen.fill(BG)
-
-
-class Soldier(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, speed, color):
-        pygame.sprite.Sprite.__init__(self)
-        self.speed = speed
-        self.direction_x = 0
-        self.direction_y = 0
+class Soldier:
+    def __init__(self, x, y, width, height, color):
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
-        self.jump = False
-        self.jump_height = 10
-
-    def move(self, direction_x):
-        self.direction_x = direction_x
-
-    def jump_start(self):
-        if not self.jump:
-            self.jump = True
-            self.jump_height = 10
+        self.move_right = False
+        self.move_left = False
+        self.y_direction = 0
+        self.air_time = 0
 
     def update(self):
-        self.rect.x += self.direction_x
-        self.check_boundary_collision()
-        self.check_enemy_collision()
+        self.player_movement = [0, 0]
+        if self.move_right:
+            self.player_movement[0] += 2
+        if self.move_left:
+            self.player_movement[0] -= 2
+        self.player_movement[1] += self.y_direction
+        self.y_direction += 0.2
+        if self.y_direction > 3:
+            self.y_direction = 3
 
-        if self.jump:
-            self.rect.y -= self.jump_height
-            self.jump_height -= 1
+        self.rect.x += self.player_movement[0]
+        self.rect.y += self.player_movement[1]
 
-            if self.rect.y >= 200:  # Modify the value as needed
-                self.rect.y = 200
-                self.jump = False
+        self.handle_collision()
 
-    def draw(self):
+        self.air_time += 1
+
+    def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
 
-    def check_boundary_collision(self):
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                self.move_right = True
+            if event.key == pygame.K_LEFT:
+                self.move_left = True
+            if event.key == pygame.K_UP:
+                if self.air_time < 6:
+                    self.y_direction = -5
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_RIGHT:
+                self.move_right = False
+            if event.key == pygame.K_LEFT:
+                self.move_left = False
+
+    def handle_collision(self):
+        if self.rect.y > WINDOW_SIZE[1] - self.rect.height:
+            self.rect.y = WINDOW_SIZE[1] - self.rect.height
+            self.y_direction = 0
+            self.air_time = 0
+
         if self.rect.left < 0:
             self.rect.left = 0
-        if self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
+        if self.rect.right > WINDOW_SIZE[0]:
+            self.rect.right = WINDOW_SIZE[0]
 
-    def check_enemy_collision(self):
+    def check_enemy_collision(self, enemy):
         if self.rect.colliderect(enemy.rect):
             print("Player collision with enemy detected!")
 
 
-player = Soldier(200, 200, 30, 30, 5, (255, 0, 0))
-enemy = Soldier(400, 200, 30, 30, 5, (0, 0, 255))
+clock = pygame.time.Clock()
+pygame.init()
 
-run = True
-while run:
-    clock.tick(FPS)
-    draw_bg()
+pygame.display.set_caption('Scrolling schooter')
+
+WINDOW_SIZE = (600, 400)
+screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
+
+player = Soldier(50, 50, 30, 30, (255, 0, 0))
+enemy = Soldier(400, 200, 30, 30, (0, 0, 255))
+
+while True:
+    screen.fill((144, 201, 120))
+
+    player.update()
+
+    player.draw(screen)
+    enemy.draw(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                run = False
-            if event.key == pygame.K_LEFT:
-                player.move(-player.speed)
-            if event.key == pygame.K_RIGHT:
-                player.move(player.speed)
-            if event.key == pygame.K_UP:
-                player.jump_start()
+            pygame.quit()
+        player.handle_event(event)
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                player.move(0)
+    player.check_enemy_collision(enemy)
 
-    player.update()
-    player.draw()
-    enemy.draw()
     pygame.display.update()
-
-pygame.quit()
+    clock.tick(60)
