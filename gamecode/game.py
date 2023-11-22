@@ -111,10 +111,6 @@ game_map = [['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0
                 '1', '1', '1', '1', '1', '1', '1', '1', '1'],
             ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1']]
 
-# ... (your existing code)
-
-# ... (your existing code)
-
 running = True
 
 while running:
@@ -129,7 +125,7 @@ while running:
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
 
-    screen.fill((144, 201, 120))  # Clear the screen
+    screen.fill((144, 201, 120))
 
     tile_rects = []
     y = 0
@@ -151,7 +147,6 @@ while running:
     player.update()
     enemy.update()
 
-    # Draw the player and enemy
     player.draw(screen)
     enemy.draw(screen)
 
