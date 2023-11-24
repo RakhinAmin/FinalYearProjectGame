@@ -104,7 +104,7 @@ screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
 player = Soldier(30, 30, 20, 20, (255, 0, 0))
-enemy = Soldier(400, 200, 30, 30, (0, 0, 255))
+enemy = Soldier(400, 200, 20, 20, (0, 0, 255))
 
 grass_image = pygame.image.load('grass.png')
 TILE_SIZE = grass_image.get_width()
