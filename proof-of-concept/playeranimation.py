@@ -28,6 +28,22 @@ class Player:
         # Initialize with a starting segment
         self.body = [pygame.Rect(self.box_x, self.box_y, 25, 25)]
 
+        def move_up(self):
+            self.direction_x = 0
+            self.direction_y = -25
+
+        def move_down(self):
+            self.direction_x = 0
+            self.direction_y = 25
+
+        def move_left(self):
+            self.direction_x = -25
+            self.direction_y = 0
+
+        def move_right(self):
+            self.direction_x = 25
+            self.direction_y = 0
+
     run = True
     while run:
         for event in pygame.event.get():
