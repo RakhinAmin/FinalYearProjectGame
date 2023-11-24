@@ -10,6 +10,8 @@ pygame.display.set_caption('Simple Shooter Game')
 
 
 class Player:
+    def __init__(self):
+        pygame.init()  # Initialize Pygame
         self.box_x = 100  # Initial x-coordinate of the snake's head
         self.box_y = 100  # Initial y-coordinate of the snake's head
         self.screen = pygame.display.set_mode(
