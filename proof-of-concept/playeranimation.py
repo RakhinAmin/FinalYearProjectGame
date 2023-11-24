@@ -44,19 +44,25 @@ class Player:
             self.direction_x = 25
             self.direction_y = 0
 
-    run = True
-    while run:
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    run = False  # Exit the game when the ESC key is pressed
-                if event.key == K_UP:
-                    self.move_up()  # Call the move_up method
-                if event.key == K_DOWN:
-                    self.move_down()  # Call the move_down method
-                if event.key == K_LEFT:
-                    self.move_left()  # Call the move_left method
-                if event.key == K_RIGHT:
-                    self.move_right()  # Call the move_right method
+    def run_program(self):
+        run = True
+        while run:
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        run = False  # Exit the game when the ESC key is pressed
+                    if event.key == K_UP:
+                        self.move_up()  # Call the move_up method
+                    if event.key == K_DOWN:
+                        self.move_down()  # Call the move_down method
+                    if event.key == K_LEFT:
+                        self.move_left()  # Call the move_left method
+                    if event.key == K_RIGHT:
+                        self.move_right()  # Call the move_right method
                 elif event.type == QUIT:
-                    run = False
+                    run = False  # Exit the game when the window is closed
+
+
+if __name__ == "__main__":
+    game = Player()
+    game.run_program()
