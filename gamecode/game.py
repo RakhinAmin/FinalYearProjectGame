@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 
 
 class Soldier:
@@ -10,7 +11,7 @@ class Soldier:
         self.y_direction = 0
         self.air_time = 0
 
-    def update(self):
+    def update(self, tile_rects):
         self.player_movement = [0, 0]
         if self.move_right:
             self.player_movement[0] += 2
@@ -21,15 +22,17 @@ class Soldier:
         if self.y_direction > 3:
             self.y_direction = 3
 
-        self.rect.x += self.player_movement[0]
-        self.rect.y += self.player_movement[1]
+        self.rect, collisions = self.move(
+            self.rect, self.player_movement, tile_rects)
 
-        self.handle_collision()
+        if collisions['bottom']:
+            self.air_time = 0
+            self.y_direction = 0
+        else:
+            self.air_time += 1
 
-        self.air_time += 1
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.color, self.rect)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -49,15 +52,10 @@ class Soldier:
                 self.move_left = False
 
     def handle_collision(self):
-        for tile_rect in tile_rects:
-            if self.rect.colliderect(tile_rect):
-                if self.player_movement[1] > 0:
-                    self.rect.bottom = tile_rect.top
-                    self.y_direction = 0
-                    self.air_time = 0
-                elif self.player_movement[1] < 0:
-                    self.rect.top = tile_rect.bottom
-                    self.y_direction = 0
+        if self.rect.y > WINDOW_SIZE[1] - self.rect.height:
+            self.rect.y = WINDOW_SIZE[1] - self.rect.height
+            self.y_direction = 0
+            self.air_time = 0
 
         if self.rect.left < 0:
             self.rect.left = 0
@@ -68,6 +66,32 @@ class Soldier:
         if self.rect.colliderect(enemy.rect):
             print("Player collision with enemy detected!")
 
+    def move(self, rect, movement, tiles):
+        collision_types = {'top': False, 'bottom': False,
+                           'right': False, 'left': False}
+        rect.x += movement[0]
+        hit_list = self.collision_test(rect, tiles)
+        for tile in hit_list:
+            if movement[0] > 0:
+                rect.right = tile.left
+                collision_types['right'] = True
+            elif movement[0] < 0:
+                rect.left = tile.right
+                collision_types['left'] = True
+        rect.y += movement[1]
+        hit_list = self.collision_test(rect, tiles)
+        for tile in hit_list:
+            if movement[1] > 0:
+                rect.bottom = tile.top
+                collision_types['bottom'] = True
+            elif movement[1] < 0:
+                rect.top = tile.bottom
+                collision_types['top'] = True
+        return rect, collision_types
+
+    def collision_test(self, rect, tiles):
+        return [tile for tile in tiles if rect.colliderect(tile)]
+
 
 pygame.init()
 
@@ -77,19 +101,21 @@ pygame.display.set_caption('Scrolling shooter')
 
 WINDOW_SIZE = (600, 400)
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
+display = pygame.Surface((300, 200))
 
 player = Soldier(50, 50, 30, 30, (255, 0, 0))
 enemy = Soldier(400, 200, 30, 30, (0, 0, 255))
 
 grass_image = pygame.image.load('grass.png')
 TILE_SIZE = grass_image.get_width()
-
 dirt_image = pygame.image.load('dirt.png')
 
-# background_objects = [[0.25, [120, 10, 70, 400]], [0.25, [280, 30, 40, 400]], [
-#     0.5, [30, 40, 40, 400]], [0.5, [130, 90, 100, 400]], [0.5, [300, 80, 120, 400]]]
-
 true_scroll = [0, 0]
+
+moving_right = False
+moving_left = False
+vertical_momentum = 0
+air_timer = 0
 
 
 def load_map(path):
@@ -100,13 +126,8 @@ def load_map(path):
 
 game_map = load_map('map')
 
-running = True
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        player.handle_event(event)
+while True:
+    display.fill((146, 244, 255))
 
     true_scroll[0] += (player.rect.x - true_scroll[0] - 152) / 20
     true_scroll[1] += (player.rect.y - true_scroll[1] - 106) / 20
@@ -114,34 +135,66 @@ while running:
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
 
-    screen.fill((135, 206, 235))
-
     tile_rects = []
     y = 0
     for layer in game_map:
         x = 0
         for tile in layer:
             if tile == '1':
-                screen.blit(
-                    dirt_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1]))
+                display.blit(
+                    dirt_image, (x * 16 - scroll[0], y * 16 - scroll[1]))
             if tile == '2':
-                screen.blit(
-                    grass_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1]))
+                display.blit(
+                    grass_image, (x * 16 - scroll[0], y * 16 - scroll[1]))
             if tile != '0':
-                tile_rects.append(pygame.Rect(
-                    x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+                tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
             x += 1
         y += 1
 
-    player.update()
-    enemy.update()
+    player_movement = [0, 0]
+    if moving_right:
+        player_movement[0] += 2
+    if moving_left:
+        player_movement[0] -= 2
+    player_movement[1] += vertical_momentum
+    vertical_momentum += 0.2
+    if vertical_momentum > 3:
+        vertical_momentum = 3
 
-    player.draw(screen)
-    enemy.draw(screen)
+    player.rect, collisions = player.move(
+        player.rect, player_movement, tile_rects)
 
-    player.check_enemy_collision(enemy)
+    if collisions['bottom']:
+        air_timer = 0
+        vertical_momentum = 0
+    else:
+        air_timer += 1
 
+    pygame.draw.rect(display, (255, 0, 0), (player.rect.x -
+                     scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height))
+
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+        if event.type == KEYDOWN:
+            if event.key == K_RIGHT:
+                moving_right = True
+            if event.key == K_LEFT:
+                moving_left = True
+            if event.key == K_UP:
+                if air_timer < 6:
+                    vertical_momentum = -5
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+        if event.type == KEYUP:
+            if event.key == K_RIGHT:
+                moving_right = False
+            if event.key == K_LEFT:
+                moving_left = False
+
+    screen.blit(pygame.transform.scale(display, WINDOW_SIZE), (0, 0))
     pygame.display.update()
     clock.tick(60)
+
 
 pygame.quit()
