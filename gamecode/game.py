@@ -1,5 +1,7 @@
 import pygame
 from pygame.locals import *
+import noise
+import random
 
 
 class Soldier:
@@ -110,12 +112,40 @@ grass_image = pygame.image.load('grass.png')
 TILE_SIZE = grass_image.get_width()
 dirt_image = pygame.image.load('dirt.png')
 
+tile_index = {
+    1: pygame.image.load('grass.png'),
+    2: pygame.image.load('dirt.png'),
+
+}
+
 true_scroll = [0, 0]
 
 moving_right = False
 moving_left = False
 vertical_momentum = 0
 air_timer = 0
+
+CHUNK_SIZE = 8
+
+
+def generate_chunk(x, y):
+    chunk_data = []
+    for y_pos in range(CHUNK_SIZE):
+        for x_pos in range(CHUNK_SIZE):
+            target_x = x * CHUNK_SIZE + x_pos
+            target_y = y * CHUNK_SIZE + y_pos
+            tile_type = 0  # nothing
+            height = int(noise.pnoise1(target_x * 0.1, repeat=9999999) * 5)
+            if target_y > 8 - height:
+                tile_type = 2  # dirt
+            elif target_y == 8 - height:
+                tile_type = 1  # grass
+            elif target_y == 8 - height - 1:
+                if random.randint(1, 5) == 1:
+                    tile_type = 3  # plant
+            if tile_type != 0:
+                chunk_data.append([[target_x, target_y], tile_type])
+    return chunk_data
 
 
 def load_map(path):
@@ -136,20 +166,19 @@ while True:
     scroll[1] = int(scroll[1])
 
     tile_rects = []
-    y = 0
-    for layer in game_map:
-        x = 0
-        for tile in layer:
-            if tile == '1':
+    for y in range(3):
+        for x in range(4):
+            target_x = x - 1 + int(round(scroll[0]/(CHUNK_SIZE*16)))
+            target_y = y - 1 + int(round(scroll[1]/(CHUNK_SIZE*16)))
+            target_chunk = str(target_x) + ';' + str(target_y)
+            if target_chunk not in game_map:
+                game_map[target_chunk] = generate_chunk(target_x, target_y)
+            for tile in game_map[target_chunk]:
                 display.blit(
-                    dirt_image, (x * 16 - scroll[0], y * 16 - scroll[1]))
-            if tile == '2':
-                display.blit(
-                    grass_image, (x * 16 - scroll[0], y * 16 - scroll[1]))
-            if tile != '0':
-                tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
-            x += 1
-        y += 1
+                    tile_index[tile[1]], (tile[0][0]*16-scroll[0], tile[0][1]*16-scroll[1]))
+                if tile[1] in [1, 2]:
+                    tile_rects.append(pygame.Rect(
+                        tile[0][0]*16, tile[0][1]*16, 16, 16))
 
     player_movement = [0, 0]
     if moving_right:
