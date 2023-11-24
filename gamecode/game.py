@@ -49,10 +49,15 @@ class Soldier:
                 self.move_left = False
 
     def handle_collision(self):
-        if self.rect.y > WINDOW_SIZE[1] - self.rect.height:
-            self.rect.y = WINDOW_SIZE[1] - self.rect.height
-            self.y_direction = 0
-            self.air_time = 0
+        for tile_rect in tile_rects:
+            if self.rect.colliderect(tile_rect):
+                if self.player_movement[1] > 0:
+                    self.rect.bottom = tile_rect.top
+                    self.y_direction = 0
+                    self.air_time = 0
+                elif self.player_movement[1] < 0:
+                    self.rect.top = tile_rect.bottom
+                    self.y_direction = 0
 
         if self.rect.left < 0:
             self.rect.left = 0
@@ -81,8 +86,8 @@ TILE_SIZE = grass_image.get_width()
 
 dirt_image = pygame.image.load('dirt.png')
 
-background_objects = [[0.25, [120, 10, 70, 400]], [0.25, [280, 30, 40, 400]], [
-    0.5, [30, 40, 40, 400]], [0.5, [130, 90, 100, 400]], [0.5, [300, 80, 120, 400]]]
+# background_objects = [[0.25, [120, 10, 70, 400]], [0.25, [280, 30, 40, 400]], [
+#     0.5, [30, 40, 40, 400]], [0.5, [130, 90, 100, 400]], [0.5, [300, 80, 120, 400]]]
 
 true_scroll = [0, 0]
 
