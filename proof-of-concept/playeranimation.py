@@ -6,63 +6,77 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Simple Shooter Game')
+pygame.display.set_caption('Player animation POC')
+
+clock = pygame.time.Clock()
+FPS = 60
+
+BG = (144, 201, 120)
 
 
-class Player:
-    def __init__(self):
-        pygame.init()  # Initialize Pygame
-        self.box_x = 100  # Initial x-coordinate of the snake's head
-        self.box_y = 100  # Initial y-coordinate of the snake's head
-        self.screen = pygame.display.set_mode(
-            (700, 700))  # Create the game window
-        pygame.display.set_caption("Snake Game")  # Set the window title
-
-        self.direction_x = 0  # Initial x-direction of the snake's movement
-        self.direction_y = 0  # Initial y-direction of the snake's movement
-        self.move_timer = 0  # Initialize a timer for controlling movement
-        # Set the interval for snake movement (milliseconds)
-        self.move_interval = 150
-        self.clock = pygame.time.Clock()  # Create a Pygame clock object
-
-        # Initialize with a starting segment
-        self.body = [pygame.Rect(self.box_x, self.box_y, 25, 25)]
-
-        def move_up(self):
-            self.direction_x = 0
-            self.direction_y = -25
-
-        def move_down(self):
-            self.direction_x = 0
-            self.direction_y = 25
-
-        def move_left(self):
-            self.direction_x = -25
-            self.direction_y = 0
-
-        def move_right(self):
-            self.direction_x = 25
-            self.direction_y = 0
-
-    def run_program(self):
-        run = True
-        while run:
-            for event in pygame.event.get():
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        run = False  # Exit the game when the ESC key is pressed
-                    if event.key == K_UP:
-                        self.move_up()  # Call the move_up method
-                    if event.key == K_DOWN:
-                        self.move_down()  # Call the move_down method
-                    if event.key == K_LEFT:
-                        self.move_left()  # Call the move_left method
-                    if event.key == K_RIGHT:
-                        self.move_right()  # Call the move_right method
-                elif event.type == QUIT:
-                    run = False  # Exit the game when the window is closed
+def draw_bg():
+    screen.fill(BG)
 
 
-if __name__ == "__main__":
-    game = Player()
-    game.run_program()
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height, speed, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.speed = speed
+        self.direction_x = 0
+        self.direction_y = 0
+        self.rect = pygame.Rect(x, y, width, height)
+        self.color = color
+        self.jump = False
+        self.jump_height = 10
+
+    def move(self, direction_x):
+        self.direction_x = direction_x
+
+    def jump_start(self):
+        if not self.jump:
+            self.jump = True
+            self.jump_height = 10
+
+    def update(self):
+        self.rect.x += self.direction_x
+
+        if self.jump:
+            self.rect.y -= self.jump_height
+            self.jump_height -= 1
+
+            if self.rect.y >= 200:
+                self.rect.y = 200
+                self.jump = False
+
+    def draw(self):
+        pygame.draw.rect(screen, self.color, self.rect)
+
+
+player = Player(200, 200, 30, 30, 5, (255, 0, 0))
+
+run = True
+while run:
+    clock.tick(FPS)
+    draw_bg()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                run = False
+            if event.key == pygame.K_LEFT:
+                player.move(-player.speed)
+            if event.key == pygame.K_RIGHT:
+                player.move(player.speed)
+            if event.key == pygame.K_SPACE:
+                player.jump_start()
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                player.move(0)
+
+    player.update()
+    player.draw()
+    pygame.display.update()
+
+pygame.quit()
