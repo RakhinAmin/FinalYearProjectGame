@@ -16,6 +16,7 @@ BG = (144, 201, 120)
 player_image = pygame.image.load("player.png").convert()
 player_image = pygame.transform.scale(
     player_image, (30, 30))
+playerflip = pygame.transform.flip(player_image, True, False)
 
 
 class Player(pygame.sprite.Sprite):
@@ -40,6 +41,11 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.direction_x
+
+        if self.direction_x < 0:
+            self.image = playerflip
+        elif self.direction_x > 0:
+            self.image = player_image
 
         if self.jump:
             self.rect.y -= self.jump_height
