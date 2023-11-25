@@ -13,19 +13,20 @@ FPS = 60
 
 BG = (144, 201, 120)
 
-
-def draw_bg():
-    screen.fill(BG)
+player_image = pygame.image.load("player.png").convert()
+player_image = pygame.transform.scale(
+    player_image, (30, 30))
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, speed, color):
+    def __init__(self, x, y, speed):
         pygame.sprite.Sprite.__init__(self)
         self.speed = speed
         self.direction_x = 0
         self.direction_y = 0
-        self.rect = pygame.Rect(x, y, width, height)
-        self.color = color
+        self.image = player_image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
         self.jump = False
         self.jump_height = 10
 
@@ -49,15 +50,15 @@ class Player(pygame.sprite.Sprite):
                 self.jump = False
 
     def draw(self):
-        pygame.draw.rect(screen, self.color, self.rect)
+        screen.blit(self.image, self.rect.topleft)
 
 
-player = Player(200, 200, 30, 30, 5, (255, 0, 0))
+player = Player(200, 200, 5)
 
 run = True
 while run:
     clock.tick(FPS)
-    draw_bg()
+    screen.fill(BG)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
