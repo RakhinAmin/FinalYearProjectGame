@@ -1,9 +1,10 @@
-import pygame
-import noise
+import pygame  # import necessary modules for pygame and noise
+import noise  # noise module used for procedural generation
 from pygame.locals import *
 
 
-class Soldier:
+class Soldier:  # class created for the player character
+    # initialising attributes for player character with color, movement and position
     def __init__(self, x, y, width, height, color):
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
@@ -12,30 +13,33 @@ class Soldier:
         self.y_direction = 0
         self.air_time = 0
 
+    # method to update the player position, handle movement, and check for collisions with environment
     def update(self, tile_rects):
         self.player_movement = [0, 0]
-        if self.move_right:
+        if self.move_right:  # update left and right movements
             self.player_movement[0] += 2
         if self.move_left:
             self.player_movement[0] -= 2
+        # update vertical jump movement (simulates gravity)
         self.player_movement[1] += self.y_direction
         self.y_direction += 0.2
         if self.y_direction > 3:
             self.y_direction = 3
 
-        self.rect, collisions = self.move(
+        self.rect, collisions = self.move(  # call the movement method and collision method
             self.rect, self.player_movement, tile_rects)
 
+        # collision detection with the ground, eventually will implement game over mechanism
         if collisions['bottom']:
             self.air_time = 0
             self.y_direction = 0
         else:
             self.air_time += 1
 
-    def draw(self, surface):
+    def draw(self, surface):  # draw and display the player character
         pygame.draw.rect(surface, self.color, self.rect)
 
-    def handle_event(self, event):
+    def handle_event(self, event):  # method to handle keyboard inputs for movement
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
                 self.move_right = True
@@ -52,7 +56,7 @@ class Soldier:
             if event.key == pygame.K_LEFT:
                 self.move_left = False
 
-    def handle_collision(self):
+    def handle_collision(self):  # method to handle collisions with the display boundaries
         if self.rect.y > WINDOW_SIZE[1] - self.rect.height:
             self.rect.y = WINDOW_SIZE[1] - self.rect.height
             self.y_direction = 0
@@ -65,6 +69,7 @@ class Soldier:
 
     def check_enemy_collision(self, enemy):
         if self.rect.colliderect(enemy.rect):
+            # console log shows collision detection with enemy, will be further implemented later
             print("Player collision with enemy detected!")
 
     def move(self, rect, movement, tiles):
@@ -90,7 +95,7 @@ class Soldier:
                 collision_types['top'] = True
         return rect, collision_types
 
-    def collision_test(self, rect, tiles):
+    def collision_test(self, rect, tiles):  # checking for collision with tile map tiles
         return [tile for tile in tiles if rect.colliderect(tile)]
 
 
