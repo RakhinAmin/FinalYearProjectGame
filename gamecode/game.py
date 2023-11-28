@@ -89,7 +89,7 @@ class Soldier:  # class created for the player character
                 # Check if the player is colliding with a plant tile
             if tile[1] == 3:
                 # Slow down the player when colliding with a plant
-                movement[0] *= 0.05
+                movement[0] *= 0.9
         rect.y += movement[1]
         hit_list = self.collision_test(rect, tiles)
         for tile in hit_list:
@@ -117,6 +117,7 @@ screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
 player = Soldier(30, 30, 20, 20, (255, 0, 0))
+enemy = Soldier(170, 170, 20, 20, (0, 0, 255))
 
 moving_right = False
 moving_left = False
@@ -176,6 +177,8 @@ while True:  # game loop
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
 
+    pygame.draw.rect(display, (7, 80, 75), pygame.Rect(0, 120, 300, 80))
+
     tile_rects = []
     for y in range(3):
         for x in range(4):
@@ -214,6 +217,10 @@ while True:  # game loop
 
     pygame.draw.rect(display, (255, 0, 0), (player.rect.x -
                      scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height))
+
+    enemy.update(tile_rects)
+    pygame.draw.rect(display, enemy.color, (enemy.rect.x -
+                     scroll[0], enemy.rect.y - scroll[1], enemy.rect.width, enemy.rect.height))
 
     for event in pygame.event.get():
         if event.type == QUIT:
