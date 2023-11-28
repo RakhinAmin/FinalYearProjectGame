@@ -24,7 +24,7 @@ class Soldier:  # class created for the player character
             self.player_movement[0] -= 2
         # update vertical jump movement (simulates gravity)
         self.player_movement[1] += self.y_direction
-        self.y_direction += 0.2
+        self.y_direction += 0.05
         if self.y_direction > 3:
             self.y_direction = 3
 
