@@ -1,6 +1,8 @@
-import pygame  # import necessary modules for pygame and noise
-import noise  # noise module used for procedural generation
 from pygame.locals import *
+import pygame
+import random
+import noise
+clock = pygame.time.Clock()
 
 
 class Soldier:  # class created for the player character
@@ -99,46 +101,49 @@ class Soldier:  # class created for the player character
         return [tile for tile in tiles if rect.colliderect(tile)]
 
 
+pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
+pygame.mixer.set_num_channels(64)
 
-clock = pygame.time.Clock()
-
-pygame.display.set_caption('Scrolling shooter')
+pygame.display.set_caption('Pygame Platformer')
 
 WINDOW_SIZE = (600, 400)
+
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
 player = Soldier(30, 30, 20, 20, (255, 0, 0))
-enemy = Soldier(400, 200, 20, 20, (0, 0, 255))
 
-grass_image = pygame.image.load('grass.png')
-TILE_SIZE = grass_image.get_width()
-dirt_image = pygame.image.load('dirt.png')
+moving_right = False
+moving_left = False
+vertical_momentum = 0
+air_timer = 0
 
 true_scroll = [0, 0]
 
 CHUNK_SIZE = 8
 
 
-def generate_chunk(x, y):
-    chunk_data = []
+def procedural_map(x, y):
+    map_chunk_data = []
     for y_pos in range(CHUNK_SIZE):
         for x_pos in range(CHUNK_SIZE):
             target_x = x * CHUNK_SIZE + x_pos
             target_y = y * CHUNK_SIZE + y_pos
-            tile_type = 0  # nothing
             height = int(noise.pnoise1(target_x * 0.1, repeat=9999999) * 5)
+
+            tile_type = 0  # nothing
             if target_y > 8 - height:
                 tile_type = 2  # dirt
             elif target_y == 8 - height:
                 tile_type = 1  # grass
-            elif target_y == 8 - height - 1:
-                if random.randint(1, 5) == 1:
-                    tile_type = 3  # plant
+            elif target_y == 8 - height - 1 and random.randint(1, 5) == 1:
+                tile_type = 3  # plant
+
             if tile_type != 0:
-                chunk_data.append([[target_x, target_y], tile_type])
-    return chunk_data
+                map_chunk_data.append([[target_x, target_y], tile_type])
+
+    return map_chunk_data
 
 
 moving_right = False
@@ -146,17 +151,20 @@ moving_left = False
 vertical_momentum = 0
 air_timer = 0
 
+grass_img = pygame.image.load('grass.png')
+dirt_img = pygame.image.load('dirt.png')
+plant_img = pygame.image.load('plant.png').convert()
+plant_img.set_colorkey((255, 255, 255))
 
-def load_map(path):
-    with open(path + '.txt', 'r') as f:
-        game_map = [list(row) for row in f.read().split('\n')]
-    return game_map
+tile_index = {1: grass_img,
+              2: dirt_img,
+              3: plant_img
+              }
 
+game_map = {}
 
-game_map = load_map('map')
-
-while True:
-    display.fill((146, 244, 255))
+while True:  # game loop
+    display.fill((146, 244, 255))  # clear screen by filling it with blue
 
     true_scroll[0] += (player.rect.x - true_scroll[0] - 152) / 20
     true_scroll[1] += (player.rect.y - true_scroll[1] - 106) / 20
@@ -165,20 +173,19 @@ while True:
     scroll[1] = int(scroll[1])
 
     tile_rects = []
-    y = 0
-    for layer in game_map:
-        x = 0
-        for tile in layer:
-            if tile == '1':
+    for y in range(3):
+        for x in range(4):
+            target_x = x - 1 + int(round(scroll[0] / (CHUNK_SIZE * 16)))
+            target_y = y - 1 + int(round(scroll[1] / (CHUNK_SIZE * 16)))
+            target_chunk = (target_x, target_y)
+            if target_chunk not in game_map:
+                game_map[target_chunk] = procedural_map(target_x, target_y)
+            for tile in game_map[target_chunk]:
                 display.blit(
-                    dirt_image, (x * 16 - scroll[0], y * 16 - scroll[1]))
-            if tile == '2':
-                display.blit(
-                    grass_image, (x * 16 - scroll[0], y * 16 - scroll[1]))
-            if tile != '0':
-                tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
-            x += 1
-        y += 1
+                    tile_index[tile[1]], (tile[0][0] * 16 - scroll[0], tile[0][1] * 16 - scroll[1]))
+                if tile[1] in [1, 2]:
+                    tile_rects.append(pygame.Rect(
+                        tile[0][0] * 16, tile[0][1] * 16, 16, 16))
 
     player_movement = [0, 0]
     if moving_right:
@@ -189,6 +196,8 @@ while True:
     vertical_momentum += 0.2
     if vertical_momentum > 3:
         vertical_momentum = 3
+
+    player.update(tile_rects)
 
     player.rect, collisions = player.move(
         player.rect, player_movement, tile_rects)
