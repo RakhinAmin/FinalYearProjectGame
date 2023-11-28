@@ -86,6 +86,10 @@ class Soldier:  # class created for the player character
             elif movement[0] < 0:
                 rect.left = tile.right
                 collision_types['left'] = True
+                # Check if the player is colliding with a plant tile
+            if tile[1] == 3:
+                # Slow down the player when colliding with a plant
+                movement[0] *= 0.05
         rect.y += movement[1]
         hit_list = self.collision_test(rect, tiles)
         for tile in hit_list:
