@@ -1,4 +1,5 @@
 import pygame
+import os
 
 pygame.init()
 
@@ -6,7 +7,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Player animation POC')
+pygame.display.set_caption('Shooting bullets POC')
 
 clock = pygame.time.Clock()
 FPS = 60
@@ -14,8 +15,7 @@ FPS = 60
 BG = (144, 201, 120)
 
 player_image = pygame.image.load("player.png").convert()
-player_image = pygame.transform.scale(
-    player_image, (30, 30))
+player_image = pygame.transform.scale(player_image, (30, 30))
 playerflip = pygame.transform.flip(player_image, True, False)
 
 
@@ -80,7 +80,6 @@ bullet_img = pygame.transform.scale(bullet_img, (20, 20))
 shoot = False
 bullet_group = pygame.sprite.Group()
 
-
 player = Player(200, 200, 5)
 
 run = True
@@ -108,8 +107,17 @@ while run:
             if event.key == pygame.K_f:
                 shoot = False
 
+    bullet_group.update()
+    bullet_group.draw(screen)
+
     player.update()
     player.draw()
+
+    if shoot:
+        bullet = Bullet(player.rect.centerx, player.rect.centery,
+                        1 if player.direction_x > 0 else -1)
+        bullet_group.add(bullet)
+
     pygame.display.update()
 
 pygame.quit()
