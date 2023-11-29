@@ -74,11 +74,9 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
-# Load bullet image
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (20, 20))
 
-# Define shooting-related variables
 shoot = False
 bullet_group = pygame.sprite.Group()
 
@@ -102,9 +100,13 @@ while run:
                 player.move(player.speed)
             if event.key == pygame.K_SPACE:
                 player.jump_start()
+            if event.key == pygame.K_f:
+                shoot = True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 player.move(0)
+            if event.key == pygame.K_f:
+                shoot = False
 
     player.update()
     player.draw()
