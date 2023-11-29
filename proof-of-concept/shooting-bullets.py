@@ -74,14 +74,8 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
-# Load bullet image
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (20, 20))
-
-# Define shooting-related variables
-shoot = False
-bullet_group = pygame.sprite.Group()
-
 
 player = Player(200, 200, 5)
 
