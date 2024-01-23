@@ -12,7 +12,7 @@ pygame.display.set_caption('Shooting bullets POC')
 clock = pygame.time.Clock()
 FPS = 60
 
-BG = (144, 201, 120)
+BG = (146, 244, 255)
 
 player_image = pygame.image.load("player.png").convert()
 player_image = pygame.transform.scale(player_image, (30, 30))
