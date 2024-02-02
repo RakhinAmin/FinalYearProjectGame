@@ -124,6 +124,8 @@ moving_left = False
 vertical_momentum = 0
 air_timer = 0
 
+bullet_img = pygame.image.load('bullet.png').convert_alpha()
+
 true_scroll = [0, 0]
 
 CHUNK_SIZE = 8

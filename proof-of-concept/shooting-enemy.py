@@ -7,16 +7,20 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Shooting bullets POC')
+pygame.display.set_caption('Shooting bullets at enemy POC')
 
 clock = pygame.time.Clock()
 FPS = 60
 
-BG = (146, 244, 255)
+BG = (144, 201, 120)
 
 player_image = pygame.image.load("player.png").convert()
 player_image = pygame.transform.scale(player_image, (30, 30))
 playerflip = pygame.transform.flip(player_image, True, False)
+
+enemy_image = pygame.image.load("player.png").convert()
+enemy_image = pygame.transform.scale(enemy_image, (30, 30))
+enemy_flip = pygame.transform.flip(enemy_image, True, False)
 
 
 class Player(pygame.sprite.Sprite):
@@ -59,6 +63,20 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect.topleft)
 
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = enemy_image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+
+    def update(self):
+        pass
+
+    def draw(self):
+        screen.blit(self.image, self.rect.topleft)
+
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
@@ -73,6 +91,10 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
 
+        if pygame.sprite.spritecollide(enemy, bullet_group, False):
+            enemy.kill()
+            self.kill()
+
 
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (20, 20))
@@ -81,6 +103,7 @@ shoot = False
 bullet_group = pygame.sprite.Group()
 
 player = Player(200, 200, 5)
+enemy = Enemy(400, 200)
 
 run = True
 while run:
@@ -112,6 +135,8 @@ while run:
 
     player.update()
     player.draw()
+
+    enemy.draw()
 
     if shoot:
         bullet = Bullet(player.rect.centerx, player.rect.centery,
