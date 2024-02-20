@@ -265,8 +265,8 @@ while True:  # game loop
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
             if event.key == K_f:
-                bullet = Bullet(player.rect.centerx, player.rect.centery,
-                                1 if player_movement[0] > 0 else -1)
+                bullet = Bullet(
+                    player.rect.centerx - scroll[0], player.rect.centery - scroll[1] - 10, 1 if player_movement[0] > 0 else -1)
                 bullet_group.add(bullet)
         if event.type == KEYUP:
             if event.key == K_RIGHT:
