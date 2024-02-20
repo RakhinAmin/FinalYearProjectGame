@@ -114,6 +114,11 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direction = direction
 
+    def update(self):
+        self.rect.x += (self.direction * self.speed)
+        if self.rect.right < 0 or self.rect.left > WINDOW_SIZE[0]:
+            self.kill()
+
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -136,6 +141,9 @@ air_timer = 0
 
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (20, 20))
+
+shoot = False
+bullet_group = pygame.sprite.Group()
 
 true_scroll = [0, 0]
 
@@ -169,6 +177,9 @@ moving_left = False
 vertical_momentum = 0
 air_timer = 0
 
+bullet_img = pygame.image.load('bullet.png').convert_alpha()
+bullet_img = pygame.transform.scale(bullet_img, (20, 20))
+
 grass_img = pygame.image.load('grass.png')
 dirt_img = pygame.image.load('dirt.png')
 plant_img = pygame.image.load('plant.png').convert()
@@ -180,6 +191,8 @@ tile_index = {1: grass_img,
               }
 
 game_map = {}
+
+bullet_group = pygame.sprite.Group()
 
 while True:  # game loop
     display.fill((146, 244, 255))  # clear screen by filling it with blue
@@ -235,6 +248,9 @@ while True:  # game loop
     pygame.draw.rect(display, enemy.color, (enemy.rect.x -
                      scroll[0], enemy.rect.y - scroll[1], enemy.rect.width, enemy.rect.height))
 
+    bullet_group.update()
+    bullet_group.draw(display)
+
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -248,6 +264,10 @@ while True:  # game loop
                     vertical_momentum = -5
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
+            if event.key == K_f:
+                bullet = Bullet(player.rect.centerx, player.rect.centery,
+                                1 if player_movement[0] > 0 else -1)
+                bullet_group.add(bullet)
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 moving_right = False
