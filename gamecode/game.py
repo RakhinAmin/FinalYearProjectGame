@@ -178,7 +178,9 @@ vertical_momentum = 0
 air_timer = 0
 
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
-bullet_img = pygame.transform.scale(bullet_img, (20, 20))
+bullet_img = pygame.transform.scale(bullet_img, (10, 10))
+
+player_img = pygame.image.load('player.png').convert_alpha()
 
 grass_img = pygame.image.load('grass.png')
 dirt_img = pygame.image.load('dirt.png')
