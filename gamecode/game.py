@@ -5,42 +5,63 @@ import noise
 clock = pygame.time.Clock()
 
 
-class Soldier:  # class created for the player character
-    # initialising attributes for player character with color, movement and position
-    def __init__(self, x, y, width, height, color):
+class Soldier:
+    def __init__(self, x, y, width, height, color, char_type):
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
         self.move_right = False
         self.move_left = False
         self.y_direction = 0
         self.air_time = 0
+        self.animation_list = self.load_images(char_type)
+        self.index = 0
+        self.update_time = pygame.time.get_ticks()
+        self.image = self.animation_list[self.index]
 
-    # method to update the player position, handle movement, and check for collisions with environment
+    def load_images(self, char_type):
+        animation_list = []
+        for i in range(5):
+            img = pygame.image.load(
+                f'img/{char_type}/idle/{i}.png').convert_alpha()
+            animation_list.append(img)
+        return animation_list
+
     def update(self, tile_rects):
         self.player_movement = [0, 0]
-        if self.move_right:  # update left and right movements
+        if self.move_right:
             self.player_movement[0] += 2
         if self.move_left:
             self.player_movement[0] -= 2
-        # update vertical jump movement (simulates gravity)
+
         self.player_movement[1] += self.y_direction
         self.y_direction += 0.05
         if self.y_direction > 3:
             self.y_direction = 3
 
-        self.rect, collisions = self.move(  # call the movement method and collision method
+        self.rect, collisions = self.move(
             self.rect, self.player_movement, tile_rects)
 
-        # collision detection with the ground, eventually will implement game over mechanism
         if collisions['bottom']:
             self.air_time = 0
             self.y_direction = 0
         else:
             self.air_time += 1
 
-    def draw(self, surface):  # draw and display the player character
-        surface.blit(player_img if self.color == (
-            255, 0, 0) else enemy_img, (self.rect.x - scroll[0], self.rect.y - scroll[1]))
+    def update_animation(self):
+        ANIMATION_COOLDOWN = 100
+        # update image depending on current frame
+        self.image = self.animation_list[self.index]
+        # check if enough time has passed since the last update
+        if pygame.time.get_ticks() - self.update_time > ANIMATION_COOLDOWN:
+            self.update_time = pygame.time.get_ticks()
+            self.index += 1
+        # if animation runs out then reset to the start
+        if self.index >= len(self.animation_list):
+            self.index = 0
+
+    def draw(self, surface, scroll):
+        surface.blit(self.image, (self.rect.x -
+                     scroll[0], self.rect.y - scroll[1]))
 
     def handle_event(self, event):  # method to handle keyboard inputs for movement
         if event.type == pygame.KEYDOWN:
@@ -132,8 +153,8 @@ WINDOW_SIZE = (600, 400)
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
-player = Soldier(30, 30, 20, 20, (255, 0, 0))
-enemy = Soldier(170, 170, 20, 20, (0, 0, 255))
+player = Soldier(30, 30, 20, 20, (255, 0, 0), 'player')
+enemy = Soldier(170, 170, 20, 20, (0, 0, 255), 'enemy')
 
 moving_right = False
 moving_left = False
@@ -245,10 +266,11 @@ while True:  # game loop
     else:
         air_timer += 1
 
-    player.draw(display)
+    player.update_animation()
+    player.draw(display, scroll)
 
     enemy.update(tile_rects)
-    enemy.draw(display)  # Draw the enemy using its draw method
+    enemy.draw(display, scroll)  # Draw the enemy using its draw method
 
     bullet_group.update()
     bullet_group.draw(display)
