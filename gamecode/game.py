@@ -39,7 +39,8 @@ class Soldier:  # class created for the player character
             self.air_time += 1
 
     def draw(self, surface):  # draw and display the player character
-        pygame.draw.rect(surface, self.color, self.rect)
+        surface.blit(player_img, (self.rect.x -
+                     scroll[0], self.rect.y - scroll[1]))
 
     def handle_event(self, event):  # method to handle keyboard inputs for movement
         if event.type == pygame.KEYDOWN:
@@ -131,6 +132,7 @@ WINDOW_SIZE = (600, 400)
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
+img = pygame.image.load('img/player/idle/player.png')
 player = Soldier(30, 30, 20, 20, (255, 0, 0))
 enemy = Soldier(170, 170, 20, 20, (0, 0, 255))
 
@@ -180,7 +182,7 @@ air_timer = 0
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (10, 10))
 
-player_img = pygame.image.load('player.png').convert_alpha()
+player_img = pygame.image.load('img/player/idle/player.png').convert_alpha()
 
 grass_img = pygame.image.load('grass.png')
 dirt_img = pygame.image.load('dirt.png')
@@ -243,8 +245,7 @@ while True:  # game loop
     else:
         air_timer += 1
 
-    pygame.draw.rect(display, (255, 0, 0), (player.rect.x -
-                     scroll[0], player.rect.y - scroll[1], player.rect.width, player.rect.height))
+    player.draw(display)
 
     enemy.update(tile_rects)
     pygame.draw.rect(display, enemy.color, (enemy.rect.x -
