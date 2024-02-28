@@ -15,15 +15,24 @@ class Soldier:
         self.air_time = 0
         self.animation_list = self.load_images(char_type)
         self.index = 0
+        self.action = 0
         self.update_time = pygame.time.get_ticks()
-        self.image = self.animation_list[self.index]
+        self.image = self.animation_list[self.action][self.index]
 
     def load_images(self, char_type):
         animation_list = []
+        temp_list = []
         for i in range(5):
             img = pygame.image.load(
                 f'img/{char_type}/idle/{i}.png').convert_alpha()
-            animation_list.append(img)
+            temp_list.append(img)
+        animation_list.append(temp_list)
+        temp_list = []
+        for i in range(6):
+            img = pygame.image.load(
+                f'img/{char_type}/run/{i}.png').convert_alpha()
+            temp_list.append(img)
+        animation_list.append(temp_list)
         return animation_list
 
     def update(self, tile_rects):
@@ -50,14 +59,22 @@ class Soldier:
     def update_animation(self):
         ANIMATION_COOLDOWN = 100
         # update image depending on current frame
-        self.image = self.animation_list[self.index]
+        self.image = self.animation_list[self.action][self.index]
         # check if enough time has passed since the last update
         if pygame.time.get_ticks() - self.update_time > ANIMATION_COOLDOWN:
             self.update_time = pygame.time.get_ticks()
             self.index += 1
         # if animation runs out then reset to the start
-        if self.index >= len(self.animation_list):
+        if self.index >= len(self.animation_list[self.action]):
             self.index = 0
+
+    def update_action(self, new_action):
+        # check if new action is different from previous one
+        if new_action != self.action:
+            self.action = new_action
+            # update animation settings
+            self.index = 0
+            self.update_time = pygame.time.get_ticks()
 
     def draw(self, surface, scroll):
         surface.blit(self.image, (self.rect.x -
@@ -245,6 +262,11 @@ while True:  # game loop
                     tile_rects.append(pygame.Rect(
                         tile[0][0] * 16, tile[0][1] * 16, 16, 16))
 
+    # update player actions
+    if moving_left or moving_right:
+        player.update_action(1)  # means run
+    else:
+        player.update_action(0)  # means idle
     player_movement = [0, 0]
     if moving_right:
         player_movement[0] += 2
