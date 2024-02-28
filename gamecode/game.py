@@ -180,8 +180,6 @@ moving_left = False
 vertical_momentum = 0
 air_timer = 0
 
-bullet_img = pygame.image.load('bullet.png').convert_alpha()
-bullet_img = pygame.transform.scale(bullet_img, (20, 20))
 
 shoot = False
 bullet_group = pygame.sprite.Group()
