@@ -8,10 +8,12 @@ clock = pygame.time.Clock()
 class Soldier:
     def __init__(self, x, y, width, height, color, char_type):
         self.rect = pygame.Rect(x, y, width, height)
+        self.alive = True
         self.color = color
         self.move_right = False
         self.move_left = False
         self.y_direction = 0
+        self.jump = False
         self.air_time = 0
         self.animation_list = self.load_images(char_type)
         self.index = 0
@@ -77,8 +79,8 @@ class Soldier:
             self.update_time = pygame.time.get_ticks()
 
     def draw(self, surface, scroll):
-        surface.blit(self.image, (self.rect.x -
-                     scroll[0], self.rect.y - scroll[1]))
+        adjusted_y = self.rect.y - scroll[1] - 15  # Adjust 10 pixels higher
+        surface.blit(self.image, (self.rect.x - scroll[0], adjusted_y))
 
     def handle_event(self, event):  # method to handle keyboard inputs for movement
         if event.type == pygame.KEYDOWN:
@@ -263,10 +265,12 @@ while True:  # game loop
                         tile[0][0] * 16, tile[0][1] * 16, 16, 16))
 
     # update player actions
-    if moving_left or moving_right:
-        player.update_action(1)  # means run
-    else:
-        player.update_action(0)  # means idle
+    if player.alive:
+        if moving_left or moving_right:
+            player.update_action(1)  # means run
+        else:
+            player.update_action(0)  # means idle
+
     player_movement = [0, 0]
     if moving_right:
         player_movement[0] += 2
@@ -305,7 +309,8 @@ while True:  # game loop
                 moving_right = True
             if event.key == K_LEFT:
                 moving_left = True
-            if event.key == K_UP:
+            if event.key == K_UP and player.alive:
+                player.jump = True
                 if air_timer < 6:
                     vertical_momentum = -5
             if event.key == pygame.K_ESCAPE:
