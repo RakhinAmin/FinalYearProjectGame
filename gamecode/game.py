@@ -291,6 +291,7 @@ while True:  # game loop
         air_timer += 1
 
     player.update_animation()
+    enemy.update_animation()
     player.draw(display, scroll)
 
     enemy.update(tile_rects)
