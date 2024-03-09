@@ -156,10 +156,20 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direction = direction
 
-    def update(self):
+    def update(self, tile_rects, scroll):  # Accept scroll as a parameter
         self.rect.x += (self.direction * self.speed)
         if self.rect.right < 0 or self.rect.left > WINDOW_SIZE[0]:
             self.kill()
+
+        # Adjust bullet's rect for scroll
+        bullet_rect = self.rect.copy()
+        bullet_rect.x += scroll[0]
+        bullet_rect.y += scroll[1]
+
+        # Check for collision with the map tiles
+        for tile_rect in tile_rects:
+            if bullet_rect.colliderect(tile_rect):
+                self.kill()  # Remove the bullet if it collides with a tile
 
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -296,9 +306,10 @@ while True:  # game loop
     player.draw(display, scroll)
 
     enemy.update(tile_rects)
-    enemy.draw(display, scroll)  # Draw the enemy using its draw method
+    enemy.draw(display, scroll)
 
-    bullet_group.update()
+    for bullet in bullet_group:
+        bullet.update(tile_rects, scroll)
     bullet_group.draw(display)
 
     for event in pygame.event.get():
