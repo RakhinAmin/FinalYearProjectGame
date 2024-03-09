@@ -2,6 +2,7 @@ from pygame.locals import *
 import pygame
 import random
 import noise
+import os
 clock = pygame.time.Clock()
 
 
@@ -22,19 +23,19 @@ class Soldier:
         self.image = self.animation_list[self.action][self.index]
 
     def load_images(self, char_type):
+        animation_types = ['idle', 'run', 'jump']
         animation_list = []
-        temp_list = []
-        for i in range(5):
-            img = pygame.image.load(
-                f'img/{char_type}/idle/{i}.png').convert_alpha()
-            temp_list.append(img)
-        animation_list.append(temp_list)
-        temp_list = []
-        for i in range(6):
-            img = pygame.image.load(
-                f'img/{char_type}/run/{i}.png').convert_alpha()
-            temp_list.append(img)
-        animation_list.append(temp_list)
+        for animation in animation_types:
+            temp_list = []
+            path = f'img/{char_type}/{animation}'
+            num_of_frames = len(os.listdir(path))
+            print(f"Loading {num_of_frames} frames from {path}")
+            for i in range(num_of_frames):
+                img_path = f'{path}/{i}.png'
+                print(f"Loading image {img_path}")
+                img = pygame.image.load(img_path).convert_alpha()
+                temp_list.append(img)
+            animation_list.append(temp_list)
         return animation_list
 
     def update(self, tile_rects):
@@ -219,8 +220,8 @@ air_timer = 0
 bullet_img = pygame.image.load('bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (10, 10))
 
-player_img = pygame.image.load('img/player/idle/player.png').convert_alpha()
-enemy_img = pygame.image.load('img/enemy/idle/enemy.png').convert_alpha()
+player_img = pygame.image.load('img/player/idle/5.png').convert_alpha()
+enemy_img = pygame.image.load('img/enemy/idle/5.png').convert_alpha()
 
 grass_img = pygame.image.load('grass.png')
 dirt_img = pygame.image.load('dirt.png')
