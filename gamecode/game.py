@@ -156,20 +156,10 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direction = direction
 
-    def update(self, tile_rects, scroll):  # Accept scroll as a parameter
+    def update(self):
         self.rect.x += (self.direction * self.speed)
         if self.rect.right < 0 or self.rect.left > WINDOW_SIZE[0]:
             self.kill()
-
-        # Adjust bullet's rect for scroll
-        bullet_rect = self.rect.copy()
-        bullet_rect.x += scroll[0]
-        bullet_rect.y += scroll[1]
-
-        # Check for collision with the map tiles
-        for tile_rect in tile_rects:
-            if bullet_rect.colliderect(tile_rect):
-                self.kill()  # Remove the bullet if it collides with a tile
 
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -185,6 +175,7 @@ display = pygame.Surface((300, 200))
 
 player = Soldier(30, 30, 20, 20, (255, 0, 0), 'player')
 enemy = Soldier(170, 170, 20, 20, (0, 0, 255), 'enemy')
+enemy2 = Soldier(200, 200, 20, 20, (255, 0, 255), 'enemy')
 
 moving_right = False
 moving_left = False
@@ -227,15 +218,15 @@ moving_left = False
 vertical_momentum = 0
 air_timer = 0
 
-bullet_img = pygame.image.load('bullet.png').convert_alpha()
+bullet_img = pygame.image.load('img/icons/bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (10, 10))
 
 player_img = pygame.image.load('img/player/idle/5.png').convert_alpha()
 enemy_img = pygame.image.load('img/enemy/idle/5.png').convert_alpha()
 
-grass_img = pygame.image.load('grass.png')
-dirt_img = pygame.image.load('dirt.png')
-plant_img = pygame.image.load('plant.png').convert()
+grass_img = pygame.image.load('img/tiles/grass.png')
+dirt_img = pygame.image.load('img/tiles/dirt.png')
+plant_img = pygame.image.load('img/tiles/plant.png').convert()
 plant_img.set_colorkey((255, 255, 255))
 
 tile_index = {1: grass_img,
@@ -306,10 +297,12 @@ while True:  # game loop
     player.draw(display, scroll)
 
     enemy.update(tile_rects)
-    enemy.draw(display, scroll)
+    enemy.draw(display, scroll)  # Draw the enemy using its draw method
 
-    for bullet in bullet_group:
-        bullet.update(tile_rects, scroll)
+    enemy2.update(tile_rects)
+    enemy2.draw(display, scroll)
+
+    bullet_group.update()
     bullet_group.draw(display)
 
     for event in pygame.event.get():
