@@ -168,7 +168,7 @@ pygame.mixer.set_num_channels(64)
 
 pygame.display.set_caption('Pygame Platformer')
 
-WINDOW_SIZE = (800, 608)
+WINDOW_SIZE = (800, 540)
 
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
