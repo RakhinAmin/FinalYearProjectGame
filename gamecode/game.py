@@ -27,7 +27,7 @@ class Soldier:
         animation_list = []
         for animation in animation_types:
             temp_list = []
-            path = f'img/{char_type}/{animation}'
+            path = f'assets/img/{char_type}/{animation}'
             num_of_frames = len(os.listdir(path))
             print(f"Loading {num_of_frames} frames from {path}")
             for i in range(num_of_frames):
@@ -168,14 +168,13 @@ pygame.mixer.set_num_channels(64)
 
 pygame.display.set_caption('Pygame Platformer')
 
-WINDOW_SIZE = (600, 400)
+WINDOW_SIZE = (800, 608)
 
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
 player = Soldier(30, 30, 20, 20, (255, 0, 0), 'player')
 enemy = Soldier(170, 170, 20, 20, (0, 0, 255), 'enemy')
-enemy2 = Soldier(200, 200, 20, 20, (255, 0, 255), 'enemy')
 
 moving_right = False
 moving_left = False
@@ -218,15 +217,15 @@ moving_left = False
 vertical_momentum = 0
 air_timer = 0
 
-bullet_img = pygame.image.load('img/icons/bullet.png').convert_alpha()
+bullet_img = pygame.image.load('assets/img/bullet.png').convert_alpha()
 bullet_img = pygame.transform.scale(bullet_img, (10, 10))
 
-player_img = pygame.image.load('img/player/idle/5.png').convert_alpha()
-enemy_img = pygame.image.load('img/enemy/idle/5.png').convert_alpha()
+player_img = pygame.image.load('assets/img/player/idle/4.png').convert_alpha()
+enemy_img = pygame.image.load('assets/img/enemy/idle/4.png').convert_alpha()
 
-grass_img = pygame.image.load('img/tiles/grass.png')
-dirt_img = pygame.image.load('img/tiles/dirt.png')
-plant_img = pygame.image.load('img/tiles/plant.png').convert()
+grass_img = pygame.image.load('assets/img/grass.png')
+dirt_img = pygame.image.load('assets/img/dirt.png')
+plant_img = pygame.image.load('assets/img/plant.png').convert()
 plant_img.set_colorkey((255, 255, 255))
 
 tile_index = {1: grass_img,
@@ -247,7 +246,7 @@ while True:  # game loop
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
 
-    pygame.draw.rect(display, (7, 80, 75), pygame.Rect(0, 120, 300, 80))
+    # pygame.draw.rect(display, (7, 80, 75), pygame.Rect(0, 120, 300, 80))
 
     tile_rects = []
     for y in range(3):
@@ -298,9 +297,6 @@ while True:  # game loop
 
     enemy.update(tile_rects)
     enemy.draw(display, scroll)  # Draw the enemy using its draw method
-
-    enemy2.update(tile_rects)
-    enemy2.draw(display, scroll)
 
     bullet_group.update()
     bullet_group.draw(display)
