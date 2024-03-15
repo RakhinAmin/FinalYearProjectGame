@@ -77,3 +77,28 @@ class Map:
                         self.tile_rects.append(rect)
 
                         # pygame.draw.rect(utils.display,(233,23,23),(rect.x - utils.scroll[0],rect.y - utils.scroll[1],rect.w, rect.h),1)
+
+    def resetTiles(self):
+        self.tile_rects = []
+
+    def collidePlayer(self, player):
+        rect = player.getRect()
+        isCollide = False
+        for tile in self.tile_rects:
+            if utils.collide_rect(tile, player.getRect()):
+                isCollide = True
+                if player.vel.y > 0:
+                    player.onGround = True
+                    player.acc.y = 0
+                    player.vel.y = 0
+                    player.jumping = False
+                    player.pos.y = player.prevPos.y
+                    continue
+                if player.vel.x > 0:
+                    player.pos.x = player.prevPos.x
+                elif player.vel.x < 0:
+                    player.pos.x = player.prevPos.x
+
+        if not isCollide:
+            player.onGround = False
+        return False

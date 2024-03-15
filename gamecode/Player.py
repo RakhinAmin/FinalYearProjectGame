@@ -1,7 +1,10 @@
 import pygame
 from pygame.math import Vector2
 
-
+from Game.GameObject import GameObject
+from utils.SpriteSheet import SpriteSheet
+from utils.assets_manager import assetsManager
+from utils.sounds import sounds
 from utils.util import utils
 
 
@@ -10,6 +13,12 @@ class Player(GameObject):
         super().__init__(pos, None)
         self.speed = 5
         self.jumping = False
+
+        self.sheets = {
+            'idle': SpriteSheet(assetsManager.get("player-idle"), 1, 5),
+            'run': SpriteSheet(assetsManager.get("player-run"), 1, 6),
+            'jump': SpriteSheet(assetsManager.get("player-jump"), 1, 1),
+        }
 
         self.sheets['idle'].setPlay(0, 4, 0.07, True)
         self.sheets['run'].setPlay(0, 5, 0.07, True)
