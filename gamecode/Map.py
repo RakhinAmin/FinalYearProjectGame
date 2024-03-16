@@ -1,36 +1,48 @@
 import random
-
 import noise
 import pygame
-
 from utils.util import utils
+
+# Map class for generating and managing the game map.
 
 
 class Map:
+    # Constructor for the Map class.
     def __init__(self):
+        # Size of each chunk in the map.
         self.CHUNK_SIZE = 8
+        # Loading and setting up images for different types of tiles.
         self.grass_img = pygame.image.load('assets/img/grass.png')
         self.dirt_img = pygame.image.load('assets/img/dirt.png')
         self.plant_img = pygame.image.load('assets/img/plant.png').convert()
+        # Making white color transparent for the plant image.
         self.plant_img.set_colorkey((255, 255, 255))
+        # Mapping tile types to their respective images.
         self.tile_index = {
             1: self.grass_img,
             2: self.dirt_img,
             3: self.plant_img
         }
+        # Scroll offset for the map.
         self.true_scroll = [0, 0]
+        # Dictionary to store the game map data.
         self.game_map = {}
+        # List to keep track of the tile rectangles for collision detection.
         self.tile_rects = []
 
+    # Method to generate map data procedurally for a chunk.
     def procedural_map(self, x, y):
         map_chunk_data = []
         for y_pos in range(self.CHUNK_SIZE):
             for x_pos in range(self.CHUNK_SIZE):
+                # Calculating the absolute position in the map.
                 target_x = x * self.CHUNK_SIZE + x_pos
                 target_y = y * self.CHUNK_SIZE + y_pos
+                # Using Perlin noise to generate height values.
                 height = int(noise.pnoise1(target_x * 0.1, repeat=9999999) * 5)
 
-                tile_type = 0  # nothing
+                tile_type = 0  # Default to no tile.
+                # Assigning tile types based on the generated height.
                 if target_y > 8 - height:
                     tile_type = 2  # dirt
                 elif target_y == 8 - height:
@@ -43,21 +55,21 @@ class Map:
 
         return map_chunk_data
 
+    # Method to update the map's scroll position based on the player's position.
     def update(self, player):
+        # Smooth scrolling effect by interpolating between the current scroll position and the player's position.
         self.true_scroll[0] += (player.pos.x - self.true_scroll[0] - 50) / 20
         self.true_scroll[1] += (player.pos.y - self.true_scroll[1] - 106) / 20
 
+    # Method to draw the visible portion of the map.
     def draw(self):
-        # true_scroll[0] += (player.rect.x - true_scroll[0] - 152) / 20
-        # true_scroll[1] += (player.rect.y - true_scroll[1] - 106) / 20
-
         scroll = self.true_scroll.copy()
         scroll[0] = int(scroll[0])
         scroll[1] = int(scroll[1])
         utils.scroll = scroll
-        # pygame.draw.rect(display, (7, 80, 75), pygame.Rect(0, 120, 300, 80))
 
-        tileSize = 16
+        tileSize = 16  # Size of each tile in pixels.
+        # Looping through visible chunks and rendering them.
         for y in range(3):
             for x in range(4):
                 target_x = x - 1 + \
@@ -65,28 +77,32 @@ class Map:
                 target_y = y - 1 + \
                     int(round(scroll[1] / (self.CHUNK_SIZE * tileSize)))
                 target_chunk = (target_x, target_y)
+                # Generate chunk if it doesn't exist.
                 if target_chunk not in self.game_map:
                     self.game_map[target_chunk] = self.procedural_map(
                         target_x, target_y)
+                # Render each tile in the chunk.
                 for tile in self.game_map[target_chunk]:
-                    utils.display.blit(
-                        self.tile_index[tile[1]], (tile[0][0] * tileSize - scroll[0], tile[0][1] * tileSize - scroll[1]))
+                    utils.display.blit(self.tile_index[tile[1]],
+                                       (tile[0][0] * tileSize - scroll[0], tile[0][1] * tileSize - scroll[1]))
+                    # Add tile rectangle to the list for collision detection.
                     if tile[1] in [1, 2]:
                         rect = pygame.Rect(
                             tile[0][0] * tileSize, tile[0][1] * tileSize, tileSize, tileSize)
                         self.tile_rects.append(rect)
 
-                        # pygame.draw.rect(utils.display,(233,23,23),(rect.x - utils.scroll[0],rect.y - utils.scroll[1],rect.w, rect.h),1)
-
+    # Method to reset the list of tile rectangles.
     def resetTiles(self):
         self.tile_rects = []
 
+    # Method to check and handle collisions between the player and the map.
     def collidePlayer(self, player):
         rect = player.getRect()
         isCollide = False
         for tile in self.tile_rects:
             if utils.collide_rect(tile, player.getRect()):
                 isCollide = True
+                # Handling vertical collision (landing on a tile).
                 if player.vel.y > 0:
                     player.onGround = True
                     player.acc.y = 0
@@ -94,11 +110,13 @@ class Map:
                     player.jumping = False
                     player.pos.y = player.prevPos.y
                     continue
+                # Handling horizontal collision.
                 if player.vel.x > 0:
                     player.pos.x = player.prevPos.x
                 elif player.vel.x < 0:
                     player.pos.x = player.prevPos.x
 
+        # If no collision is detected, the player is not on the ground.
         if not isCollide:
             player.onGround = False
         return False
