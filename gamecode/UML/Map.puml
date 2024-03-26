@@ -1,0 +1,47 @@
+@startuml Map
+skinparam classAttributeIconSize 0
+
+class Map {
+    - CHUNK_SIZE: int
+    - grass_img: Surface
+    - dirt_img: Surface
+    - plant_img: Surface
+    - tile_index: dict
+    - true_scroll: list
+    - game_map: dict
+    - tile_rects: list
+
+    + __init__()
+    + procedural_map(x, y): list
+    + update(player)
+    + draw()
+    + resetTiles()
+    + collidePlayer(player): bool
+}
+
+Map ..> pygame.Surface
+Map ..> noise
+Map ..> random
+Map ..> utils.util
+
+package pygame {
+    class Surface {
+    }
+}
+
+package utils {
+    class util {
+    }
+}
+
+package noise {
+    class noise {
+    }
+}
+
+package random {
+    class random {
+    }
+}
+
+@enduml
