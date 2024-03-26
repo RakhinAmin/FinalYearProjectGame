@@ -1,0 +1,50 @@
+@startuml GameObject
+skinparam classAttributeIconSize 0
+
+class GameObject {
+    - pos: Vector2
+    - img: Surface
+    - vel: Vector2
+    - acc: Vector2
+    - visible: bool
+    - destroyFlag: bool
+    - flipX: bool
+    - health: int
+    - damage: int
+    - healthBar: Object (nullable)
+    
+    + __init__(pos, img, visible)
+    + update()
+    + applyForce(f)
+    + hit(obj)
+    + draw()
+    + getRect(): Rect
+    + setPos(pos)
+    + getPos(): Vector2
+    + getCenter(): Vector2
+}
+
+package pygame {
+    class Rect {
+    }
+
+    class Vector2 {
+    }
+}
+
+package utils {
+    class util {
+    }
+}
+
+package enum {
+    class Enum {
+    }
+}
+
+GameObject ..> pygame.Rect
+GameObject ..> pygame.Vector2
+GameObject ..> utils.util
+GameObject ..> enum.Enum
+
+@enduml
