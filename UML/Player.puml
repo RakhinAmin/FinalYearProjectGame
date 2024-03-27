@@ -1,0 +1,64 @@
+@startuml Player
+skinparam classAttributeIconSize 0
+
+class Player {
+    - speed: float
+    - jumping: bool
+    - sheets: dict
+    - currentSheet: str
+    - img: Surface
+    - rect: Rect
+    - prevPos: Vector2
+    - shootUp: bool
+    - health: int
+    - bullets: int
+    - onGround: bool
+    - gravity: float
+
+    + __init__(pos)
+    + update()
+    + draw()
+    + onKeyDown(key)
+    + onKeyUp(key)
+    + getRect(): Rect
+}
+
+Player --|> GameObject
+
+GameObject <|-- Player
+
+Player ..> SpriteSheet
+Player ..> assetsManager
+Player ..> sounds
+Player ..> utils
+Player ..> pygame.Vector2
+Player ..> pygame.rect.Rect
+
+package utils {
+    class SpriteSheet {
+        + setPlay(start, end, speed, loop)
+        + getCurrentFrame(): Surface
+        + play()
+    }
+    class assetsManager {
+        {static} + get(asset_name): Surface
+    }
+    class sounds {
+        {static} + play(sound_name)
+    }
+    class util {
+        {static} + deltaTime(): float
+        {static} - scroll: list
+    }
+}
+
+package pygame {
+    class Vector2 {
+    }
+    class Rect {
+    }
+}
+
+GameObject ..> pygame.Vector2
+
+@enduml
