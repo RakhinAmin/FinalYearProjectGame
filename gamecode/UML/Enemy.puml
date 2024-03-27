@@ -1,0 +1,70 @@
+@startuml Enemy
+skinparam classAttributeIconSize 0
+
+class Enemy {
+    - onGround: bool
+    - prevPos: Vector2
+    - sheet: SpriteSheet
+    - addObjectCallBack: Callable
+    - shootTime: float
+    - health: int
+    - healthBar: HealthBar
+
+    + __init__(pos, addObjectCallBack)
+    + update()
+    - shoot()
+    + draw()
+    + getRect(): Rect
+}
+
+Enemy --|> GameObject
+
+GameObject <|-- Enemy
+
+Enemy ..> SpriteSheet
+Enemy ..> HealthBar
+Enemy ..> EnemyBullet
+Enemy ..> assetsManager
+Enemy ..> sounds
+Enemy ..> utils
+
+package utils {
+    class SpriteSheet {
+        + setPlay(start, end, speed, loop)
+        + getCurrentFrame(): Surface
+        + play()
+    }
+    class HealthBar {
+        + draw(health, pos)
+    }
+    class assetsManager {
+        {static} + get(asset_name): Surface
+    }
+    class sounds {
+        {static} + play(sound_name)
+    }
+    class util {
+        {static} + deltaTime(): float
+        {static} - scroll: list
+    }
+}
+
+package Game {
+    class EnemyBullet {
+        + __init__(pos, direction)
+    }
+}
+
+Enemy ..> pygame.rect.Rect
+Enemy ..> pygame.Vector2
+
+package pygame {
+    class Vector2 {
+    }
+    class Rect {
+    }
+}
+
+GameObject ..> pygame.Vector2
+
+@enduml

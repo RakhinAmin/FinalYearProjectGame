@@ -1,4 +1,4 @@
-@startuml
+@startuml BulletKit
 skinparam classAttributeIconSize 0
 
 class BulletKit {
