@@ -1,0 +1,33 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class BulletKit {
+    - onGround: bool
+    - prevPos: Vector2
+
+    + __init__(pos)
+    + update()
+}
+
+BulletKit --|> GameObject
+
+GameObject <|-- BulletKit
+
+BulletKit ..> assetsManager
+
+package utils {
+    class assetsManager {
+        {static} + get(asset_name): Surface
+    }
+}
+
+BulletKit ..> pygame.Vector2
+
+package pygame {
+    class Vector2 {
+    }
+}
+
+GameObject ..> pygame.Vector2
+
+@enduml
