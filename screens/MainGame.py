@@ -25,8 +25,8 @@ class MainGame(Game):
         self.objects = []
         self.map = Map()
         self.bg = Bg()
-        self.player = Player(Vector2(300/2,70),self.objects.append)
-        self.spawner = Spawner(self.objects.append,self.player)
+        self.player = Player(Vector2(300/2, 70), self.objects.append)
+        self.spawner = Spawner(self.objects.append, self.player)
         self.score = 0
 
     def update(self):
@@ -44,31 +44,32 @@ class MainGame(Game):
         for obj in self.objects:
             obj.update()
 
-            if isinstance(obj,Enemy):
+            if isinstance(obj, Enemy):
                 if obj.pos.x < self.player.pos.x - 200:
                     obj.destroyFlag = True
                     continue
 
-            if utils.collide(obj,self.player):
-                if isinstance(obj,HealthKit):
+            if utils.collide(obj, self.player):
+                if isinstance(obj, HealthKit):
                     obj.destroyFlag = True
                     self.player.health = 10
                     self.score += random.randint(1, 5)
 
-                elif isinstance(obj,BulletKit):
+                elif isinstance(obj, BulletKit):
                     obj.destroyFlag = True
                     self.player.bullets = 30
                     self.score += random.randint(1, 5)
 
                 elif isinstance(obj, EnemyBullet):
                     obj.destroyFlag = True
-                    addedObjects.append(Explosion(Vector2(obj.pos.x - 24, obj.pos.y - 24)))
+                    addedObjects.append(
+                        Explosion(Vector2(obj.pos.x - 24, obj.pos.y - 24)))
                     self.player.health -= 1
                     if self.player.health <= 0:
                         utils.currentScreen = GameOver(self.score)
                         return
 
-            if isinstance(obj,HealthKit) or isinstance(obj,BulletKit) or isinstance(obj,Enemy):
+            if isinstance(obj, HealthKit) or isinstance(obj, BulletKit) or isinstance(obj, Enemy):
                 for tile in self.map.tile_rects:
                     if utils.collide_rect(tile, obj.getRect()):
                         obj.vel.y = 0
@@ -76,21 +77,23 @@ class MainGame(Game):
                         obj.onGround = True
                 continue
 
-            if isinstance(obj,PlayerBullet) or isinstance(obj,EnemyBullet):
+            if isinstance(obj, PlayerBullet) or isinstance(obj, EnemyBullet):
                 for tile in self.map.tile_rects:
-                    if utils.collide_rect(tile,obj.getRect()):
+                    if utils.collide_rect(tile, obj.getRect()):
                         obj.destroyFlag = True
-                        addedObjects.append(Explosion(Vector2(obj.pos.x - 24, obj.pos.y - 24)))
+                        addedObjects.append(
+                            Explosion(Vector2(obj.pos.x - 24, obj.pos.y - 24)))
                         continue
-            if isinstance(obj,PlayerBullet):
+            if isinstance(obj, PlayerBullet):
                 for otherObj in self.objects:
-                    if isinstance(otherObj,Enemy) and utils.collide(obj,otherObj):
-                        addedObjects.append(Explosion(Vector2(obj.pos.x - 24, obj.pos.y - 24)))
+                    if isinstance(otherObj, Enemy) and utils.collide(obj, otherObj):
+                        addedObjects.append(
+                            Explosion(Vector2(obj.pos.x - 24, obj.pos.y - 24)))
                         otherObj.health -= 1
                         obj.destroyFlag = True
                         if otherObj.health <= 0:
                             otherObj.destroyFlag = True
-                            self.score += random.randint(1,5)
+                            self.score += random.randint(1, 5)
 
         self.objects += addedObjects
 
@@ -109,7 +112,8 @@ class MainGame(Game):
         for obj in self.objects:
             obj.draw()
 
-        utils.drawText(Vector2(35,17),str(self.score),(233,233,233),utils.font6)
+        utils.drawText(Vector2(35, 17), str(self.score),
+                       (233, 233, 233), utils.font6)
 
         # draw ui
 
@@ -127,4 +131,3 @@ class MainGame(Game):
 
     def onMouseWheel(self, event):
         pass
-
