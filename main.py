@@ -31,7 +31,8 @@ while True:
     utils.currentScreen.draw()
     utils.showFps()
 
-    utils.screen.blit(pygame.transform.scale(utils.display, (utils.width,utils.height)), (0, 0))
+    utils.screen.blit(pygame.transform.scale(
+        utils.display, (utils.width, utils.height)), (0, 0))
     utils.currentScreen.drawUI()
 
     pygame.display.flip()
