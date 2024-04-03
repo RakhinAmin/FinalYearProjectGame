@@ -23,9 +23,11 @@ class MainMenu(Game):
                             "HighScores", Vector2(3.5, 2.5)))
         self.buttons.append(
             Button(3, Vector2(280, 400), "Quit", Vector2(3.5, 2.5)))
+        self.buttons.append(
+            Button(3, Vector2(280, 500), "Controls", Vector2(3.5, 2.5)))
 
         # Adding the Controls button
-        self.buttons.append(Button(2, Vector2(280, 350),
+        self.buttons.append(Button(2, Vector2(280, 400),
                             "Controls", Vector2(3.5, 2.5)))
 
         sounds.playMusic()
