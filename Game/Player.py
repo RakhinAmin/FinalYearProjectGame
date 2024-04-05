@@ -35,7 +35,7 @@ class Player(GameObject):
         self.health = 10
 
         self.healthBar = HealthBar(self.health, (23, 233, 233), 2 * 10)
-        self.healthBar2 = HealthBar(self.health, (23, 233, 233), 80,4)
+        self.healthBar2 = HealthBar(self.health, (23, 233, 233), 80, 4)
 
         self.health = 10
         self.bullets = 10
@@ -71,9 +71,10 @@ class Player(GameObject):
         self.healthBar2.draw(self.health,
                              Vector2(2, 10))
 
-        utils.display.blit(pygame.transform.scale(assetsManager.get("bulletIcon"),(8,10)),(2,15))
-        utils.drawText(Vector2(10,16),str(self.bullets),(233,233,23),font=utils.font8)
-
+        utils.display.blit(pygame.transform.scale(
+            assetsManager.get("bulletIcon"), (8, 10)), (2, 15))
+        utils.drawText(Vector2(10, 16), str(self.bullets),
+                       (233, 233, 23), font=utils.font8)
 
     def onKeyDown(self, key):
         if key == pygame.K_a:
@@ -107,9 +108,11 @@ class Player(GameObject):
 
     def getRect(self):
         if self.flipX:
-            rect = pygame.rect.Rect(self.pos.x + 12, self.pos.y, self.img.get_width() - 18, self.img.get_height())
+            rect = pygame.rect.Rect(
+                self.pos.x + 12, self.pos.y, self.img.get_width() - 18, self.img.get_height())
         else:
-            rect = pygame.rect.Rect(self.pos.x, self.pos.y, self.img.get_width() - 12, self.img.get_height())
+            rect = pygame.rect.Rect(
+                self.pos.x, self.pos.y, self.img.get_width() - 12, self.img.get_height())
         return rect
 
     def shoot(self):
@@ -121,7 +124,8 @@ class Player(GameObject):
         dirX = 1
         if self.flipX:
             dirX = -1
-        bullet = PlayerBullet(Vector2(self.getRect().centerx + 8, self.getRect().centery - 4), dirX)
+        bullet = PlayerBullet(
+            Vector2(self.getRect().centerx + 8, self.getRect().centery - 4), dirX)
         self.addBulletCallBack(bullet)
 
         sounds.play("shot")

@@ -22,7 +22,7 @@ class Map:
         self.game_map = {}
         self.tile_rects = []
 
-    def procedural_map(self,x, y):
+    def procedural_map(self, x, y):
         map_chunk_data = []
         for y_pos in range(self.CHUNK_SIZE):
             for x_pos in range(self.CHUNK_SIZE):
@@ -43,10 +43,9 @@ class Map:
 
         return map_chunk_data
 
-    def update(self,player):
+    def update(self, player):
         self.true_scroll[0] += (player.pos.x - self.true_scroll[0] - 50) / 20
         self.true_scroll[1] += (player.pos.y - self.true_scroll[1] - 106) / 20
-
 
     def draw(self):
         # true_scroll[0] += (player.rect.x - true_scroll[0] - 152) / 20
@@ -61,11 +60,14 @@ class Map:
         tileSize = 16
         for y in range(3):
             for x in range(4):
-                target_x = x - 1 + int(round(scroll[0] / (self.CHUNK_SIZE * tileSize)))
-                target_y = y  + int(round(scroll[1] / (self.CHUNK_SIZE * tileSize)))
+                target_x = x - 1 + \
+                    int(round(scroll[0] / (self.CHUNK_SIZE * tileSize)))
+                target_y = y + \
+                    int(round(scroll[1] / (self.CHUNK_SIZE * tileSize)))
                 target_chunk = (target_x, target_y)
                 if target_chunk not in self.game_map:
-                    self.game_map[target_chunk] = self.procedural_map(target_x, target_y)
+                    self.game_map[target_chunk] = self.procedural_map(
+                        target_x, target_y)
                 for tile in self.game_map[target_chunk]:
                     utils.display.blit(
                         self.tile_index[tile[1]], (tile[0][0] * tileSize - scroll[0], tile[0][1] * tileSize - scroll[1]))
@@ -76,16 +78,14 @@ class Map:
 
                         # pygame.draw.rect(utils.display,(233,23,23),(rect.x - utils.scroll[0],rect.y - utils.scroll[1],rect.w, rect.h),1)
 
-
     def resetTiles(self):
         self.tile_rects = []
 
-
-    def collidePlayer(self,player):
+    def collidePlayer(self, player):
         rect = player.getRect()
         isCollide = False
         for tile in self.tile_rects:
-            if utils.collide_rect(tile,player.getRect()):
+            if utils.collide_rect(tile, player.getRect()):
                 isCollide = True
                 if player.vel.y > 0:
                     player.onGround = True
@@ -94,9 +94,9 @@ class Map:
                     player.jumping = False
                     player.pos.y = player.prevPos.y
                     continue
-                if player.vel.x > 0 :
+                if player.vel.x > 0:
                     player.pos.x = player.prevPos.x
-                elif player.vel.x < 0 :
+                elif player.vel.x < 0:
                     player.pos.x = player.prevPos.x
 
         if not isCollide:

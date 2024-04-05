@@ -1,0 +1,18 @@
+@startuml HealthBar
+
+class HealthBar {
+  - maxHealth: int
+  - color: tuple
+  - width: int
+  - height: int
+  + __init__(health, color, width, height = 2)
+  + draw(health, pos)
+}
+
+class utils {
+  + display: Surface
+}
+
+HealthBar --> utils
+
+@enduml

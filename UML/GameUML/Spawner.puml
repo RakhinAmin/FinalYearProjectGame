@@ -1,0 +1,45 @@
+@startuml Spawner
+
+class Spawner {
+  - addObjectCallback: function
+  - player: Player
+  - healthKitTime: int
+  - bulletKitTime: int
+  - enemyTime: int
+  + __init__(addObjectCallback, player)
+  + spawn()
+  - spawnEnemy()
+  - spawnItems()
+}
+
+class Enemy {
+  - pos: Vector2
+  - addObjectCallback: function
+  + __init__(pos, addObjectCallback)
+}
+
+class HealthKit {
+  - pos: Vector2
+  + __init__(pos)
+}
+
+class BulletKit {
+  - pos: Vector2
+  + __init__(pos)
+}
+
+class Player {
+  - pos: Vector2
+}
+
+class utils {
+  + deltaTime(): float
+}
+
+Spawner --> Player
+Spawner --> Enemy
+Spawner --> HealthKit
+Spawner --> BulletKit
+Spawner --> utils
+
+@enduml

@@ -4,7 +4,6 @@ from pygame import Vector2
 from screens.Game import Game
 from screens.HighScores import HighScores
 from screens.MainGame import MainGame
-# Import the Controls screen if you have one
 from screens.Controls import Controls
 from utils.Button import Button
 from utils.assets_manager import assetsManager

@@ -1,0 +1,29 @@
+@startuml HealthKit
+
+class HealthKit {
+  - onGround: bool
+  - prevPos: Vector2
+  + __init__(pos)
+  + update()
+  - applyForce(force: Vector2)
+}
+
+class GameObject {
+  - pos: Vector2
+  - sprite: Surface
+  + __init__(pos, sprite)
+  + update()
+}
+
+class Vector2 {
+}
+
+class assetsManager {
+  + get(key: str): Surface
+}
+
+HealthKit --|> GameObject
+HealthKit --> Vector2
+HealthKit --> assetsManager
+
+@enduml
